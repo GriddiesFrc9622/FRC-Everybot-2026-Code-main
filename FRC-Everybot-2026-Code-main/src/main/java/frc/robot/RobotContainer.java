@@ -54,7 +54,8 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    //autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem, fuelSubsystem));
+    // autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem,
+    // fuelSubsystem));
   }
 
   /**
@@ -78,7 +79,7 @@ public class RobotContainer {
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
     driverController.a().whileTrue(new Eject(fuelSubsystem));
-   // While the down arrow on the directional pad is held it will unclimb the robot
+    // While the down arrow on the directional pad is held it will unclimb the robot
     driverController.povDown().whileTrue(new ClimbDown(climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
     driverController.povUp().whileTrue(new ClimbUp(climberSubsystem));
@@ -88,7 +89,16 @@ public class RobotContainer {
     // controller. The Y axis of the controller is inverted so that pushing the
     // stick away from you (a negative value) drives the robot forwards (a positive
     // value)
-    driveSubsystem.setDefaultCommand(driveSubsystem.driveJoystick(0, 0, 0));
+    driveSubsystem.setDefaultCommand(driveSubsystem.driveJoystick(
+        () -> {
+          return -1 * driverController.getLeftY();
+        },
+        () -> {
+          return driverController.getLeftX();
+        },
+        () -> {
+          return driverController.getRightX();
+        }));
 
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
 
