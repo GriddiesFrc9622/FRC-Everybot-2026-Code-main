@@ -12,14 +12,14 @@ import static frc.robot.Constants.OperatorConstants.*;
 
 import frc.robot.commands.ClimbDown;
 import frc.robot.commands.ClimbUp;
-import frc.robot.commands.Drive;
 import frc.robot.commands.Eject;
-import frc.robot.commands.ExampleAuto;
+
 import frc.robot.commands.Intake;
 import frc.robot.commands.LaunchSequence;
-import frc.robot.subsystems.CANDriveSubsystem;
+
 import frc.robot.subsystems.CANFuelSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
+import frc.robot.subsystems.Swerve;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -30,7 +30,7 @@ import frc.robot.subsystems.ClimberSubsystem;
  */
 public class RobotContainer {
   // The robot's subsystems
-  private final CANDriveSubsystem driveSubsystem = new CANDriveSubsystem();
+  private final Swerve driveSubsystem = new Swerve();
   private final CANFuelSubsystem fuelSubsystem = new CANFuelSubsystem();
   private final ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
@@ -54,7 +54,7 @@ public class RobotContainer {
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
-    autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem, fuelSubsystem));
+    //autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem, fuelSubsystem));
   }
 
   /**
@@ -88,7 +88,7 @@ public class RobotContainer {
     // controller. The Y axis of the controller is inverted so that pushing the
     // stick away from you (a negative value) drives the robot forwards (a positive
     // value)
-    driveSubsystem.setDefaultCommand(new Drive(driveSubsystem, driverController));
+    driveSubsystem.setDefaultCommand(driveSubsystem.driveJoystick(0, 0, 0));
 
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
 
