@@ -1,9 +1,14 @@
 package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
+import java.util.stream.Collector.Characteristics;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,14 +32,36 @@ public class Swerve extends SubsystemBase {
     private final double DRIVE_WHEEL_CIRCUMFERANCE = Math.PI * DRIVE_WHEEL_DIAMETER_INCHES;
     private final double DRIVE_WHEEL_CIRCUMFERANCE_METERS = Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERANCE);
     private final double MAX_VELOCITY_METERS_PER_SEC = 4.46 * 0.9;
+    private double MAX_ROTATION = 2 * Math.PI;
+    private SwerveModule frontleft;
+    private SwerveModule frontright;
+    private SwerveModule backleft;
+    private SwerveModule backright;
+    private Pigeon2 imuPigeon2;
 
     public Swerve() {
-
+        frontleft = new SwerveModule(11, 21, Math.toRadians(-90));
+        frontright = new SwerveModule(12, 22, Math.toRadians(0));
+        backleft = new SwerveModule(13, 23, Math.toRadians(180));
+        backright = new SwerveModule(14, 24, Math.toRadians(90));
+        imuPigeon2 = new Pigeon2(0);
     }
 
     public Command driveJoystick(DoubleSupplier forwardpercent, DoubleSupplier sidetoside, DoubleSupplier rotation) {
         return this.run(() -> {
+            double forwardspeedMetersPerSecond = forwardpercent.getAsDouble() * MAX_VELOCITY_METERS_PER_SEC;
+            double sidetosidespeedMetersPerSecond = sidetoside.getAsDouble() * MAX_VELOCITY_METERS_PER_SEC;
+            double rotationperseconds = rotation.getAsDouble() * MAX_ROTATION;
 
+            ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
+                    sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
+            SwerveModuleState[] states = Kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 1.0 / 50.0));
+            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SEC);
+
+            frontleft.SetDesiredState(states[0]);
+            frontright.SetDesiredState(states[1]);
+            backleft.SetDesiredState(states[2]);
+            backright.SetDesiredState(states[3]);
         }).withName("Swerve.driveJoystick");
     }
 
