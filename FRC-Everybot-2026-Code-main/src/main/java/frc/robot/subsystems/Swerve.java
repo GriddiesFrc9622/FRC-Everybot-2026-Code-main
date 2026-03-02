@@ -108,11 +108,18 @@ public class Swerve extends SubsystemBase {
     private ChassisSpeeds getRobotRelativeSpeeds() {
         return null;
 
+
     }
 
     private void driveRobotRelative(ChassisSpeeds speeds) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'driveRobotRelative'");
+           SwerveModuleState[] states = Kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 1.0 / 50.0));
+            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SEC);
+
+            frontleft.SetDesiredState(states[0]);
+            frontright.SetDesiredState(states[1]);
+            backleft.SetDesiredState(states[2]);
+            backright.SetDesiredState(states[3]);
+        
     }
 
     public Command driveJoystick(DoubleSupplier forwardpercent, DoubleSupplier sidetoside, DoubleSupplier rotation) {
@@ -123,13 +130,7 @@ public class Swerve extends SubsystemBase {
 
             ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
                     sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
-            SwerveModuleState[] states = Kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 1.0 / 50.0));
-            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SEC);
-
-            frontleft.SetDesiredState(states[0]);
-            frontright.SetDesiredState(states[1]);
-            backleft.SetDesiredState(states[2]);
-            backright.SetDesiredState(states[3]);
+           driveRobotRelative(speeds);
         }).withName("Swerve.driveJoystick");
     }
 
