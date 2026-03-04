@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.ClimbConstants;;
 
 public class ClimberSubsystem extends SubsystemBase {
   private final SparkMax climberMotor;
@@ -16,7 +17,7 @@ public class ClimberSubsystem extends SubsystemBase {
   /** Creates a new CANBallSubsystem. */
   public ClimberSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
-    climberMotor = new SparkMax(7, MotorType.kBrushless);
+    climberMotor = new SparkMax(ClimbConstants.CLIMBER_MOTOR_ID, MotorType.kBrushless);
 
     // create the configuration for the climb moter, set a current limit and apply
     // the config to the controller

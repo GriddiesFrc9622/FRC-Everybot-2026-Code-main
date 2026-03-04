@@ -51,10 +51,10 @@ public class Swerve extends SubsystemBase {
     private SwerveDrivePoseEstimator poseEstimator;
 
     public Swerve() {
-        frontleft = new SwerveModule(11, 21, Math.toRadians(-90));
-        frontright = new SwerveModule(12, 22, Math.toRadians(0));
-        backleft = new SwerveModule(13, 23, Math.toRadians(180));
-        backright = new SwerveModule(14, 24, Math.toRadians(90));
+        frontleft = new SwerveModule(22, 21, Math.toRadians(-90));
+        frontright = new SwerveModule(32, 31, Math.toRadians(0));
+        backleft = new SwerveModule(12, 11, Math.toRadians(180));
+        backright = new SwerveModule(42, 41, Math.toRadians(90));
         imuPigeon2 = new Pigeon2(0);
         poseEstimator = new SwerveDrivePoseEstimator(Kinematics, imuPigeon2.getRotation2d(),
                 new SwerveModulePosition[] {
