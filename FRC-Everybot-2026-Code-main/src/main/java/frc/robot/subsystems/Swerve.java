@@ -9,11 +9,13 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.Odometry;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -40,11 +42,13 @@ public class Swerve extends SubsystemBase {
     private final double DRIVE_WHEEL_CIRCUMFERANCE_METERS = Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERANCE);
     private final double MAX_VELOCITY_METERS_PER_SEC = 4.46 * 0.9;
     private double MAX_ROTATION = 2 * Math.PI;
+
     private SwerveModule frontleft;
     private SwerveModule frontright;
     private SwerveModule backleft;
     private SwerveModule backright;
     private Pigeon2 imuPigeon2;
+    private SwerveDrivePoseEstimator poseEstimator;
 
     public Swerve() {
         frontleft = new SwerveModule(11, 21, Math.toRadians(-90));
@@ -52,6 +56,11 @@ public class Swerve extends SubsystemBase {
         backleft = new SwerveModule(13, 23, Math.toRadians(180));
         backright = new SwerveModule(14, 24, Math.toRadians(90));
         imuPigeon2 = new Pigeon2(0);
+        poseEstimator = new SwerveDrivePoseEstimator(Kinematics, imuPigeon2.getRotation2d(),
+                new SwerveModulePosition[] {
+                        frontleft.getPosition(), frontright.getPosition(), backleft.getPosition(),
+                        backright.getPosition()
+                }, new Pose2d());
 
         // Load the RobotConfig from the GUI settings. You should probably
         // store this in your Constants file
@@ -97,29 +106,28 @@ public class Swerve extends SubsystemBase {
     }
 
     private Pose2d getPose() {
-        return null;
+        return poseEstimator.getEstimatedPosition();
 
     }
 
     private void resetPose(Pose2d Pose) {
-
+        poseEstimator.resetPose(Pose);
     }
 
     private ChassisSpeeds getRobotRelativeSpeeds() {
-        return null;
-
-
+        return Kinematics.toChassisSpeeds(frontleft.getState(), frontright.getState(), backleft.getState(),
+                backright.getState());
     }
 
     private void driveRobotRelative(ChassisSpeeds speeds) {
-           SwerveModuleState[] states = Kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 1.0 / 50.0));
-            SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SEC);
+        SwerveModuleState[] states = Kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(speeds, 1.0 / 50.0));
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, MAX_VELOCITY_METERS_PER_SEC);
 
-            frontleft.SetDesiredState(states[0]);
-            frontright.SetDesiredState(states[1]);
-            backleft.SetDesiredState(states[2]);
-            backright.SetDesiredState(states[3]);
-        
+        frontleft.SetDesiredState(states[0]);
+        frontright.SetDesiredState(states[1]);
+        backleft.SetDesiredState(states[2]);
+        backright.SetDesiredState(states[3]);
+
     }
 
     public Command driveJoystick(DoubleSupplier forwardpercent, DoubleSupplier sidetoside, DoubleSupplier rotation) {
@@ -130,8 +138,14 @@ public class Swerve extends SubsystemBase {
 
             ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
                     sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
-           driveRobotRelative(speeds);
+            driveRobotRelative(speeds);
         }).withName("Swerve.driveJoystick");
+    }
+
+    public void periodic() {
+        poseEstimator.update(imuPigeon2.getRotation2d(), new SwerveModulePosition[] {
+                frontleft.getPosition(), frontright.getPosition(), backleft.getPosition(), backright.getPosition()
+        });
     }
 
 }
