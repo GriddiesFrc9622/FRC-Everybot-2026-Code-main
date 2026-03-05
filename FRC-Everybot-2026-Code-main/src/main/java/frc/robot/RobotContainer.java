@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -91,13 +92,13 @@ public class RobotContainer {
     // value)
     driveSubsystem.setDefaultCommand(driveSubsystem.driveJoystick(
         () -> {
-          return -1 * driverController.getLeftY();
+          return -1 * MathUtil.applyDeadband(driverController.getLeftY(), 0.05);
         },
         () -> {
-          return driverController.getLeftX();
+          return MathUtil.applyDeadband(driverController.getLeftX(), DRIVER_CONTROLLER_PORT);
         },
         () -> {
-          return driverController.getRightX();
+          return MathUtil.applyDeadband(driverController.getRightX(), DRIVER_CONTROLLER_PORT);
         }));
 
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));

@@ -136,10 +136,11 @@ public class Swerve extends SubsystemBase {
             double sidetosidespeedMetersPerSecond = sidetoside.getAsDouble() * MAX_VELOCITY_METERS_PER_SEC;
             double rotationperseconds = rotation.getAsDouble() * MAX_ROTATION;
 
-            ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
-                    sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
+          //   ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
+            //        sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
+            ChassisSpeeds speeds = new ChassisSpeeds (forwardspeedMetersPerSecond, sidetosidespeedMetersPerSecond, rotationperseconds);
             driveRobotRelative(speeds);
-        }).withName("Swerve.driveJoystick");
+        }).withName("Swerve.driveJoystick"); 
     }
 
     public void periodic() {
