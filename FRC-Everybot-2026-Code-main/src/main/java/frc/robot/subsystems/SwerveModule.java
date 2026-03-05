@@ -22,7 +22,7 @@ public class SwerveModule {
     private static final SparkMaxConfig DRIVING_CONFIG = new SparkMaxConfig();
     private static final double STEERING_MOTOR_REDUCTION = 9424.0 / 203.0;
     private static final double DRIVE_MOTOR_PINION_TEETH = 13;
-    private static final double DRIVE_MOTOR_REDUCTION = (22.0 / DRIVE_MOTOR_PINION_TEETH) * (45.0 / 15.0);
+    private static final double DRIVE_MOTOR_REDUCTION = 1/((22.0 / DRIVE_MOTOR_PINION_TEETH) * (45.0 / 15.0));
     private static final double DRIVE_WHEEL_DIAMETER_INCHES = 3;
     private static final double DRIVE_WHEEL_CIRCUMFERANCE = Math.PI * DRIVE_WHEEL_DIAMETER_INCHES;
     private static final double DRIVE_WHEEL_CIRCUMFERANCE_METERS = Units.inchesToMeters(DRIVE_WHEEL_CIRCUMFERANCE);
@@ -36,8 +36,9 @@ public class SwerveModule {
         DRIVING_CONFIG.idleMode(IdleMode.kCoast).smartCurrentLimit(60);
         DRIVING_CONFIG.encoder.positionConversionFactor(DRIVE_MOTOR_REDUCTION * DRIVE_WHEEL_CIRCUMFERANCE_METERS)
                 .velocityConversionFactor(DRIVE_MOTOR_REDUCTION * DRIVE_WHEEL_CIRCUMFERANCE_METERS / 60);
-        DRIVING_CONFIG.closedLoop.pid(0.04, DRIVE_MOTOR_REDUCTION, DRIVE_MOTOR_PINION_TEETH).feedForward
-                .kV(MAX_VELOCITY_METERS_PER_SEC / 12);
+        DRIVING_CONFIG.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder).pid(0.04, 0, 0).feedForward
+                .kV(12 / MAX_VELOCITY_METERS_PER_SEC);
+                
 
     }
     private SparkMax steering;
