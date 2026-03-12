@@ -6,10 +6,14 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static frc.robot.Constants.OperatorConstants.*;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.robot.commands.ClimbDown;
 import frc.robot.commands.ClimbUp;
@@ -44,7 +48,7 @@ public class RobotContainer {
       OPERATOR_CONTROLLER_PORT);
 
   // The autonomous chooser
-  private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final SendableChooser<Command> autoChooser;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -52,12 +56,20 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
+    NamedCommands.registerCommand("LaunchSequence", new LaunchSequence(fuelSubsystem));
+    NamedCommands.registerCommand("ClimbDown", new ClimbDown(climberSubsystem));
+        NamedCommands.registerCommand("ClimbUp", new ClimbUp(climberSubsystem));
+
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
     // autoChooser.addOption
     // autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem,
     // fuelSubsystem));
+    autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser" , autoChooser);
+
   }
+
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -95,7 +107,7 @@ public class RobotContainer {
           return -1 * MathUtil.applyDeadband(driverController.getLeftY(), 0.05);
         },
         () -> {
-          return MathUtil.applyDeadband(driverController.getLeftX(), DRIVER_CONTROLLER_PORT);
+          return -1 * MathUtil.applyDeadband(driverController.getLeftX(), DRIVER_CONTROLLER_PORT);
         },
         () -> {
           return MathUtil.applyDeadband(driverController.getRightX(), DRIVER_CONTROLLER_PORT);
