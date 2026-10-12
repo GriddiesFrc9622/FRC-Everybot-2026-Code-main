@@ -8,6 +8,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import static frc.robot.Constants.OperatorConstants.*;
@@ -58,7 +59,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("LaunchSequence", new LaunchSequence(fuelSubsystem));
     NamedCommands.registerCommand("ClimbDown", new ClimbDown(climberSubsystem));
-        NamedCommands.registerCommand("ClimbUp", new ClimbUp(climberSubsystem));
+    NamedCommands.registerCommand("ClimbUp", new ClimbUp(climberSubsystem));
 
     // Set the options to show up in the Dashboard for selecting auto modes. If you
     // add additional auto modes you can add additional lines here with
@@ -66,10 +67,9 @@ public class RobotContainer {
     // autoChooser.setDefaultOption("Autonomous", new ExampleAuto(driveSubsystem,
     // fuelSubsystem));
     autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser" , autoChooser);
+    SmartDashboard.putData("Auto Chooser", autoChooser);
 
   }
-
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be
@@ -96,7 +96,9 @@ public class RobotContainer {
     driverController.povDown().whileTrue(new ClimbDown(climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
     driverController.povUp().whileTrue(new ClimbUp(climberSubsystem));
-
+    driverController.x().onTrue(new RunCommand(() -> {
+      driveSubsystem.resetangle();
+    }));
     // Set the default command for the drive subsystem to the command provided by
     // factory with the values provided by the joystick axes on the driver
     // controller. The Y axis of the controller is inverted so that pushing the
