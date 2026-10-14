@@ -109,10 +109,10 @@ public class RobotContainer {
           return -1 * MathUtil.applyDeadband(driverController.getLeftY(), 0.05);
         },
         () -> {
-          return -1 * MathUtil.applyDeadband(driverController.getLeftX(), DRIVER_CONTROLLER_PORT);
+          return -1 * MathUtil.applyDeadband(driverController.getLeftX(), 0.05);
         },
         () -> {
-          return MathUtil.applyDeadband(driverController.getRightX(), DRIVER_CONTROLLER_PORT);
+          return MathUtil.applyDeadband(driverController.getRightX(), 0.05);
         }));
 
     fuelSubsystem.setDefaultCommand(fuelSubsystem.run(() -> fuelSubsystem.stop()));
