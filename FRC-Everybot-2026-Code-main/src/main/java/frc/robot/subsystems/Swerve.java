@@ -11,6 +11,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.Odometry;
@@ -135,9 +136,18 @@ public class Swerve extends SubsystemBase {
             double forwardspeedMetersPerSecond = forwardpercent.getAsDouble() * MAX_VELOCITY_METERS_PER_SEC;
             double sidetosidespeedMetersPerSecond = sidetoside.getAsDouble() * MAX_VELOCITY_METERS_PER_SEC;
             double rotationperseconds = rotation.getAsDouble() * MAX_ROTATION;
+            var pigeonrotation = imuPigeon2.getRotation2d();
+            var alliance = DriverStation.getAlliance();
+            alliance.ifPresent((alliancereal) -> {
+
+                if (alliancereal == DriverStation.Alliance.Red) {
+                    pigeonrotation.rotateBy(Rotation2d.k180deg);
+
+                }
+            });
 
             ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(forwardspeedMetersPerSecond,
-                    sidetosidespeedMetersPerSecond, rotationperseconds, imuPigeon2.getRotation2d());
+                    sidetosidespeedMetersPerSecond, rotationperseconds, pigeonrotation);
             // ChassisSpeeds speeds = new ChassisSpeeds (forwardspeedMetersPerSecond,
             // sidetosidespeedMetersPerSecond, rotationperseconds);
             driveRobotRelative(speeds);
